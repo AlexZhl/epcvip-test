@@ -1,0 +1,13 @@
+app_api:
+    resource: "@AppApiBundle/Controller/"
+    type:     annotation
+    prefix:   /api
+
+app_core:
+    resource: "@AppCoreBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+app:
+    resource: '@AppBundle/Controller/'
+    type: annotation
