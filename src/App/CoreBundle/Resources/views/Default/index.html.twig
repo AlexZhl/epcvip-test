@@ -1,1 +1,9 @@
-Hello World!
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    Hello World!
+    {% if is_granted('ROLE_USER') %}
+        You are logged in as customer
+    {% endif %}
+    <a href="{{ path('showapikey') }}">Show API key</a>
+{% endblock %}

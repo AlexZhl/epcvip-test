@@ -4,12 +4,14 @@ namespace App\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @ORM\Entity
  * @ORM\Table(name="customer")
+ * @ORM\Entity(repositoryClass="App\CoreBundle\Repository\CustomerRepository")
+ * @ORM\EntityListeners({"App\CoreBundle\EventListener\CustomerListener"})
  */
-class Customer
+class Customer implements UserInterface, \Serializable
 {
     const STATUS_NEW        = 'status.new';
     const STATUS_PENDING    = 'status.pending';
@@ -24,6 +26,21 @@ class Customer
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
+
+    /**
+     * @ORM\Column(type="string", length=25, unique=true)
+     */
+    private $username;
+
+    /**
+     * @ORM\Column(type="string", length=64)
+     */
+    private $password;
+
+    /**
+     * @ORM\Column(type="string", length=60, unique=true)
+     */
+    private $email;
 
     /**
      * @ORM\Column(type="string", length=100)
@@ -51,12 +68,12 @@ class Customer
     private $createdAt;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $updatedAt;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $deletedAt;
 
@@ -65,9 +82,81 @@ class Customer
      */
     private $products;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $apiKey;
+
     public function __construct()
     {
         $this->products = new ArrayCollection();
+        $this->createdAt = new \DateTime();
+        $this->generateNewApiKey();
+    }
+
+    public function generateNewApiKey()
+    {
+        $this->setApiKey(md5(time().uniqid('dy93x2b30', true)).md5(uniqid('dy93x2b30', true).time()));
+    }
+
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    public function getSalt()
+    {
+        return null;
+    }
+
+    public function getRoles()
+    {
+        return array('ROLE_USER');
+    }
+
+    public function eraseCredentials()
+    {
+    }
+
+    /** @see \Serializable::serialize() */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->username,
+            $this->password,
+            $this->email,
+            $this->firstName,
+            $this->lastName,
+            $this->dateOfBirth,
+            $this->status,
+            $this->createdAt,
+            $this->updatedAt,
+            $this->deletedAt,
+        ));
+    }
+
+    /** @see \Serializable::unserialize() */
+    public function unserialize($serialized)
+    {
+        list (
+            $this->id,
+            $this->username,
+            $this->password,
+            $this->email,
+            $this->firstName,
+            $this->lastName,
+            $this->dateOfBirth,
+            $this->status,
+            $this->createdAt,
+            $this->updatedAt,
+            $this->deletedAt,
+            ) = unserialize($serialized);
     }
 
     /**
@@ -280,5 +369,81 @@ class Customer
     public function getProducts()
     {
         return $this->products;
+    }
+
+    /**
+     * Set username
+     *
+     * @param string $username
+     *
+     * @return Customer
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    /**
+     * Set password
+     *
+     * @param string $password
+     *
+     * @return Customer
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * Set email
+     *
+     * @param string $email
+     *
+     * @return Customer
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * Get email
+     *
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * Set apiKey
+     *
+     * @param string $apiKey
+     *
+     * @return Customer
+     */
+    public function setApiKey($apiKey)
+    {
+        $this->apiKey = $apiKey;
+
+        return $this;
+    }
+
+    /**
+     * Get apiKey
+     *
+     * @return string
+     */
+    public function getApiKey()
+    {
+        return $this->apiKey;
     }
 }

@@ -1,20 +1,38 @@
 # To get started with security, check out the documentation:
 # http://symfony.com/doc/current/security.html
 security:
-
-    # http://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
+    encoders:
+        App\CoreBundle\Entity\Customer:
+            algorithm: bcrypt
     providers:
-        in_memory:
-            memory: ~
+        db_provider:
+            entity:
+                class: AppCoreBundle:Customer
+        api_key_user_provider:
+            id: App\ApiBundle\Security\ApiKeyUserProvider
 
     firewalls:
         # disables authentication for assets and the profiler, adapt it according to your needs
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-
+        api:
+            pattern: ^/api
+            stateless: true
+            simple_preauth:
+                authenticator: App\ApiBundle\Security\ApiKeyAuthenticator
+            provider: api_key_user_provider
         main:
             anonymous: ~
+            pattern: ^/
+            form_login:
+                login_path: login
+                check_path: login
+                csrf_token_generator: security.csrf.token_manager
+            logout:
+                path:   /logout
+                target: /login
+            provider: db_provider
             # activate different ways to authenticate
 
             # http://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
@@ -22,3 +40,7 @@ security:
 
             # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
             #form_login: ~
+    access_control:
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api, roles: ROLE_API_USER }
+        - { path: ^/, roles: ROLE_USER }

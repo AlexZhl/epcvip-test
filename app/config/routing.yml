@@ -11,3 +11,6 @@ app_core:
 app:
     resource: '@AppBundle/Controller/'
     type: annotation
+
+logout:
+    path: /logout
