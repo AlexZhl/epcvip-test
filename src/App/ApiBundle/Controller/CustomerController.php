@@ -17,35 +17,34 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 class CustomerController extends BaseApiController
 {
     /**
-     * @Rest\Get("/customer")
+     * @Rest\Get("/customers")
      */
     public function allAction(Request $request)
     {
         $result = $this->getDoctrine()->getRepository(Customer::class)->findAll();
 
-        if ($result === null) {
-            return new View("There are no customers", Response::HTTP_NOT_FOUND);
-        }
-
         return $result;
     }
 
     /**
-     * @Rest\Get("/customer/{id}")
+     * @Rest\Get("/customers/{id}")
      */
     public function getAction($id)
     {
         $result = $this->getDoctrine()->getRepository(Customer::class)->find($id);
 
         if ($result === null) {
-            return new View("Customer not found", Response::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException(sprintf(
+                'No customer found with id "%s"',
+                $id
+            ));
         }
 
         return $result;
     }
 
     /**
-     * @Rest\Post("/customer")
+     * @Rest\Post("/customers")
      */
     public function newAction(Request $request, UserPasswordEncoderInterface $encoder)
     {
@@ -54,15 +53,7 @@ class CustomerController extends BaseApiController
 
         $this->processForm($request, $form);
         if (!$form->isValid()) {
-            $errors = $this->getErrorsFromForm($form);
-
-            $data = [
-                'type' => 'validation_error',
-                'title' => 'There was a validation error',
-                'errors' => $errors,
-            ];
-
-            return new View($data, Response::HTTP_BAD_REQUEST);
+            return $this->createValidationErrorResponse($form);
         }
         $password = $encoder->encodePassword($customer, '123');
         $customer->setPassword($password);
@@ -71,6 +62,56 @@ class CustomerController extends BaseApiController
         $em->persist($customer);
         $em->flush();
 
-        return new View("User Added Successfully", Response::HTTP_OK);
+        return new View($customer, Response::HTTP_OK);
+    }
+
+    /**
+     * @Rest\Put("/customers/{id}")
+     * @Rest\Patch("/customers/{id}")
+     */
+    public function putAction($id, Request $request)
+    {
+        $customer = $this->getDoctrine()->getRepository(Customer::class)->find($id);
+
+        if (!$customer) {
+            throw $this->createNotFoundException(sprintf(
+                'No customer found with id "%s"',
+                $id
+            ));
+        }
+
+        $form = $this->createForm(CustomerType::class, $customer);
+        $this->processForm($request, $form);
+        if (!$form->isValid()) {
+            return $this->createValidationErrorResponse($form);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($customer);
+        $em->flush();
+
+        return new View($customer, Response::HTTP_OK);
+
+    }
+
+    /**
+     * @Rest\Delete("/customers/{id}")
+     */
+    public function deleteAction($id, Request $request)
+    {
+        $customer = $this->getDoctrine()->getRepository(Customer::class)->find($id);
+
+        if (!$customer) {
+            throw $this->createNotFoundException(sprintf(
+                'No customer found with id "%s"',
+                $id
+            ));
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($customer);
+        $em->flush();
+
+        return new View(null, Response::HTTP_NO_CONTENT);
     }
 }

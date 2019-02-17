@@ -5,7 +5,9 @@ namespace App\ApiBundle\Controller;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class BaseApiController extends FOSRestController
 {
@@ -30,5 +32,18 @@ abstract class BaseApiController extends FOSRestController
             }
         }
         return $errors;
+    }
+
+    protected function createValidationErrorResponse(FormInterface $form)
+    {
+        $errors = $this->getErrorsFromForm($form);
+
+        $data = [
+            'type' => 'validation_error',
+            'title' => 'There was a validation error',
+            'errors' => $errors,
+        ];
+
+        return new JsonResponse($data, Response::HTTP_BAD_REQUEST);
     }
 }

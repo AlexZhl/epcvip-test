@@ -66,7 +66,7 @@ class Product
 
     /**
      * @ORM\ManyToOne(targetEntity="Customer", inversedBy="products")
-     * @ORM\JoinColumn(name="customer_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="customer_id", referencedColumnName="id", onDelete="SET NULL")
      */
     private $customer;
 
