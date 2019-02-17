@@ -1,6 +1,9 @@
 # To get started with security, check out the documentation:
 # http://symfony.com/doc/current/security.html
 security:
+    role_hierarchy:
+        ROLE_API_USER: [ROLE_API, ROLE_USER]
+
     encoders:
         App\CoreBundle\Entity\Customer:
             algorithm: bcrypt
@@ -17,6 +20,7 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         api:
+            anonymous: ~
             pattern: ^/api
             stateless: true
             simple_preauth:

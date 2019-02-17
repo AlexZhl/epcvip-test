@@ -3,11 +3,14 @@
 namespace App\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="product")
  * @ORM\EntityListeners({"App\CoreBundle\EventListener\ProductListener"})
+ * @ExclusionPolicy("all")
  */
 class Product
 {
@@ -22,31 +25,37 @@ class Product
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Expose
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Expose
      */
     private $issn;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Expose
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Expose
      */
     private $status = self::STATUS_NEW;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Expose
      */
     private $createdAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Expose
      */
     private $updatedAt;
 

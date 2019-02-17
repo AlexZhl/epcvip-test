@@ -5,11 +5,18 @@ namespace App\CoreBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use JMS\Serializer\Annotation\ExclusionPolicy;
+use JMS\Serializer\Annotation\Expose;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Table(name="customer")
  * @ORM\Entity(repositoryClass="App\CoreBundle\Repository\CustomerRepository")
  * @ORM\EntityListeners({"App\CoreBundle\EventListener\CustomerListener"})
+ * @ExclusionPolicy("all")
+ * @UniqueEntity("email")
+ * @UniqueEntity("username")
  */
 class Customer implements UserInterface, \Serializable
 {
@@ -24,41 +31,54 @@ class Customer implements UserInterface, \Serializable
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Expose
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=25, unique=true)
+     * @Expose
+     * @Assert\NotBlank
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Assert\NotBlank
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
+     * @Assert\NotBlank
+     * @Assert\Email()
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Expose
+     * @Assert\NotBlank
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Expose
+     * @Assert\NotBlank
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="date")
+     * @Assert\Date()
+     * @Assert\NotBlank
      */
     private $dateOfBirth;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Assert\NotBlank
      */
     private $status = self::STATUS_NEW;
 
