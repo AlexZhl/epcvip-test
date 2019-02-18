@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\CoreBundle\Repository\ProductRepository")
  * @ORM\Table(name="product")
  * @ORM\EntityListeners({"App\CoreBundle\EventListener\ProductListener"})
  * @ExclusionPolicy("all")

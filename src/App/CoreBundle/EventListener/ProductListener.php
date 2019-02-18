@@ -3,13 +3,13 @@
 namespace App\CoreBundle\EventListener;
 
 use App\CoreBundle\Entity\Product;
-use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 
 class ProductListener
 {
-    /** @ORM\PrePersist */
-    public function prePersistHandler(Product $product, LifecycleEventArgs $event)
+    /** @ORM\PreUpdate */
+    public function preUpdateHandler(Product $product, PreUpdateEventArgs $event)
     {
         $product->setUpdatedAt(new \DateTime());
     }
