@@ -55,7 +55,7 @@ class CustomerController extends BaseApiController
         if (!$form->isValid()) {
             return $this->createValidationErrorResponse($form);
         }
-        $password = $encoder->encodePassword($customer, '123');
+        $password = $encoder->encodePassword($customer, $form->getData()->getPassword());
         $customer->setPassword($password);
 
         $em = $this->getDoctrine()->getManager();
@@ -69,7 +69,7 @@ class CustomerController extends BaseApiController
      * @Rest\Put("/customers/{id}")
      * @Rest\Patch("/customers/{id}")
      */
-    public function putAction($id, Request $request)
+    public function putAction($id, Request $request, UserPasswordEncoderInterface $encoder)
     {
         $customer = $this->getDoctrine()->getRepository(Customer::class)->find($id);
 
@@ -84,6 +84,10 @@ class CustomerController extends BaseApiController
         $this->processForm($request, $form);
         if (!$form->isValid()) {
             return $this->createValidationErrorResponse($form);
+        }
+        if ($request->get('password')) {
+            $password = $encoder->encodePassword($customer, $form->getData()->getPassword());
+            $customer->setPassword($password);
         }
 
         $em = $this->getDoctrine()->getManager();
