@@ -5,12 +5,15 @@ namespace App\CoreBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="product")
  * @ORM\EntityListeners({"App\CoreBundle\EventListener\ProductListener"})
  * @ExclusionPolicy("all")
+ * @UniqueEntity("issn")
  */
 class Product
 {
@@ -32,18 +35,21 @@ class Product
     /**
      * @ORM\Column(type="string", length=100)
      * @Expose
+     * @Assert\NotBlank
      */
     private $issn;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Expose
+     * @Assert\NotBlank
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=100)
      * @Expose
+     * @Assert\NotBlank
      */
     private $status = self::STATUS_NEW;
 
